@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <title>Chat</title>
+</head>
+
+<body>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h2 class="my-0 mr-md-auto font-weight-normal">Chat App</h2>
+        <h5>created using node.js and socket.io</h5>
+    </div>
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2>welcome to chat app</h2>
+<p>enter your name and start chatting ;)</p>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <form id="messForm">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Enter ur name" class="form-control">
+                    <br>
+                    <label for="message">Message</label>
+                    <textarea name="message" id="message" class="form-control"
+                        placeholder="Enter ur message"></textarea>
+                    <br>
+                    <input type="submit" value="Send" class="btn btn-danger">
+                </form>
+            </div>
+            <div class="col-6">
+
+                <div id="all_mess"></div>
+            </div>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const min = 1;
+        const max = 6;
+        let random = Math.floor(Math.random() * (max - min)) + min;
+
+        let alertClass;
+        switch (random) {
+            case 1:
+                alertClass = 'secondary';
+                break;
+            case 2:
+                alertClass = 'danger';
+                break;
+            case 3:
+                alertClass = 'success';
+                break;
+            case 4:
+                alertClass = 'warning';
+                break;
+            case 5:
+                alertClass = 'info';
+                break;
+            case 6:
+                alertClass = 'light';
+                break;
+        }
+
+        $(function () {
+            const socket = io.connect();
+            const $form = $('#messForm');
+            const $textarea = $('#message');
+            const $all_messages = $('#all_mess');
+            const $name = $('#name');
+
+            $form.submit(function (e) {
+                event.preventDefault();
+                socket.emit('send', {
+                    mess: $textarea.val(),
+                    name: $name.val(),
+                    className: alertClass
+                });
+                $textarea.val('');
+            });
+
+            socket.on('addMsg', function (data) {
+                $all_messages.append("<div class='alert alert-" + data.className + "'><b>" + data.name + "</b>: " + data.msg + "</div>")
+            });
+        });
+    </script>
+</body>
+
+</html>
