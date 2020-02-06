@@ -12,38 +12,29 @@
 
 <body>
     <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-        <h5 class="my-0 mr-md-auto font-weight-normal">Company name</h5>
-        <nav class="my-2 my-md-0 mr-md-3">
-            <a class="p-2 text-dark" href="#">Features</a>
-            <a class="p-2 text-dark" href="#">Enterprise</a>
-            <a class="p-2 text-dark" href="#">Support</a>
-            <a class="p-2 text-dark" href="#">Pricing</a>
-        </nav>
-        <a class="btn btn-outline-primary" href="#">Sign up</a>
+        <h2 class="my-0 mr-md-auto font-weight-normal">Chat App</h2>
+        <h5>created using node.js and socket.io</h5>
     </div>
     <div class="container">
         <div class="py-5 text-center">
-            <h2>Чат программа</h2>
-            <p class="lead">Укажите ваше имя и начинайте переписку</p>
+            <h2>welcome to chat app</h2>
+<p>enter your name and start chatting ;)</p>
         </div>
         <div class="row">
             <div class="col-6">
-                <!-- Форма для получения сообщений и имени -->
-                <h3>Форма сообщений</h3>
                 <form id="messForm">
-                    <label for="name">Имя</label>
-                    <input type="text" name="name" id="name" placeholder="Введите имя" class="form-control">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Enter ur name" class="form-control">
                     <br>
-                    <label for="message">Сообщение</label>
+                    <label for="message">Message</label>
                     <textarea name="message" id="message" class="form-control"
-                        placeholder="Введите сообщение"></textarea>
+                        placeholder="Enter ur message"></textarea>
                     <br>
-                    <input type="submit" value="Отправить" class="btn btn-danger">
+                    <input type="submit" value="Send" class="btn btn-danger">
                 </form>
             </div>
             <div class="col-6">
-                <h3>Сообщения</h3>
-                <!-- Вывод всех сообщений будет здесь -->
+
                 <div id="all_mess"></div>
             </div>
         </div>
@@ -51,8 +42,52 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
+        const min = 1;
+        const max = 6;
+        let random = Math.floor(Math.random() * (max - min)) + min;
+
+        let alertClass;
+        switch (random) {
+            case 1:
+                alertClass = 'secondary';
+                break;
+            case 2:
+                alertClass = 'danger';
+                break;
+            case 3:
+                alertClass = 'success';
+                break;
+            case 4:
+                alertClass = 'warning';
+                break;
+            case 5:
+                alertClass = 'info';
+                break;
+            case 6:
+                alertClass = 'light';
+                break;
+        }
+
         $(function () {
             const socket = io.connect();
+            const $form = $('#messForm');
+            const $textarea = $('#message');
+            const $all_messages = $('#all_mess');
+            const $name = $('#name');
+
+            $form.submit(function (e) {
+                event.preventDefault();
+                socket.emit('send', {
+                    mess: $textarea.val(),
+                    name: $name.val(),
+                    className: alertClass
+                });
+                $textarea.val('');
+            });
+
+            socket.on('addMsg', function (data) {
+                $all_messages.append("<div class='alert alert-" + data.className + "'><b>" + data.name + "</b>: " + data.msg + "</div>")
+            });
         });
     </script>
 </body>
